@@ -31,20 +31,28 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
-        if (!ModelState.IsValid)
+        /*if (!ModelState.IsValid)
         {
             return View(model);
-        }
+        }*/
 
         string login = model.Login.Trim();
         string email = model.Email.Trim().ToLower();
+        
+        if (string.IsNullOrWhiteSpace(login))
+        {
+            ModelState.AddModelError("Login", "Enter login");
+        }
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            ModelState.AddModelError("Email", "Enter email");
+        }
 
         User? userByLogin = await _userManager.FindByNameAsync(login);
 
         if (userByLogin != null)
         {
             ModelState.AddModelError("Login", "User with this login already exists");
-            return View(model);
         }
 
         User? userByEmail = await _userManager.FindByEmailAsync(email);
@@ -52,7 +60,6 @@ public class AccountController : Controller
         if (userByEmail != null)
         {
             ModelState.AddModelError("Email", "User with this email already exists");
-            return View(model);
         }
 
         if (model.AvatarFile == null)
@@ -75,6 +82,11 @@ public class AccountController : Controller
         using (FileStream stream = new FileStream(filePath, FileMode.Create))
         {
             await model.AvatarFile.CopyToAsync(stream);
+        }
+        
+        if (!ModelState.IsValid)
+        {
+            return View(model);
         }
 
         User user = new User
