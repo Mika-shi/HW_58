@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Profile";
     bool isMyProfile = ViewBag.IsMyProfile;
+    bool isFollowing = ViewBag.IsFollowing;
 }
 
 <div class="row mb-4">
@@ -32,6 +33,31 @@
             <a asp-controller="Post" asp-action="Create" class="btn btn-primary">
                 Add post
             </a>
+        }
+        else if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            if (isFollowing)
+            {
+                <form asp-controller="Profile"
+                      asp-action="Unfollow"
+                      asp-route-id="@Model.Id"
+                      method="post">
+                    <button type="submit" class="btn btn-secondary">
+                        Unfollow
+                    </button>
+                </form>
+            }
+            else
+            {
+                <form asp-controller="Profile"
+                      asp-action="Follow"
+                      asp-route-id="@Model.Id"
+                      method="post">
+                    <button type="submit" class="btn btn-primary">
+                        Follow
+                    </button>
+                </form>
+            }
         }
     </div>
 </div>
