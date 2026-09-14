@@ -24,6 +24,11 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Register()
     {
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        
         return View();
     }
 
@@ -123,6 +128,11 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
     {
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        
         return View(new LoginViewModel { ReturnUrl = returnUrl });
     }
 

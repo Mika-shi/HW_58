@@ -1,0 +1,45 @@
+@model HW_58.Models.Post
+
+@{
+    ViewData["Title"] = "Post details";
+}
+
+<div class="card mx-auto" style="max-width: 600px;">
+    <div class="card-header">
+        @if (Model.User != null)
+        {
+            <strong>@Model.User.UserName</strong>
+        }
+        else
+        {
+            <strong>Unknown user</strong>
+        }
+    </div>
+
+    <img src="@Model.ImagePath"
+         class="card-img-top"
+         alt="Post image"
+         style="max-height: 650px; object-fit: cover;" />
+
+    <div class="card-body">
+        <p>
+            <strong>Likes:</strong> @Model.LikesCount
+        </p>
+
+        <p>
+            <strong>Comments:</strong> @Model.CommentsCount
+        </p>
+
+        <p>
+            @Model.Description
+        </p>
+
+        <p class="text-muted">
+            @Model.CreatedOn.ToString("dd.MM.yyyy HH:mm")
+        </p>
+
+        <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">
+            Back
+        </a>
+    </div>
+</div>

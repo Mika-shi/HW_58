@@ -29,8 +29,11 @@
     <div class="mb-3">
         <label asp-for="AvatarFile" class="form-label">Avatar</label>
         <input asp-for="AvatarFile" type="file" class="form-control" />
-        <span asp-validation-for="AvatarFile" class="text-danger"></span>
-    </div>
+        <input asp-for="AvatarFile"
+               type="file"
+               class="form-control"
+               accept=".jpg,.jpeg,.png,.webp" />    
+        </div>
 
     <div class="mb-3">
         <label asp-for="Password" class="form-label">Password</label>
