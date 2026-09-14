@@ -1,0 +1,38 @@
+﻿using HW_58.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace HW_58.Controllers;
+
+[Authorize]
+public class UsersController : Controller
+{
+    private readonly InstagramContext _context;
+
+    public UsersController(InstagramContext context)
+    {
+        _context = context;
+    }
+
+    public IActionResult Search(string? keyword)
+    {
+        List<User> users = new List<User>();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            string searchText = keyword.Trim().ToLower();
+
+            users = _context.Users
+                .Where(user =>
+                    user.UserName!.ToLower().Contains(searchText) ||
+                    user.Email!.ToLower().Contains(searchText) ||
+                    user.FullName.ToLower().Contains(searchText) ||
+                    user.Bio.ToLower().Contains(searchText))
+                .ToList();
+        }
+
+        ViewBag.Keyword = keyword;
+
+        return View(users);
+    }
+}
