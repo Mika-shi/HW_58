@@ -1,8 +1,80 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<HW_58.Models.Post>
+
+@{
+    ViewData["Title"] = "Feed";
+    bool isAuthenticated = ViewBag.IsAuthenticated == true;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>Feed</h1>
+
+@if (!isAuthenticated)
+{
+    <p>Please login or register to see your feed.</p>
+
+    <a asp-controller="Account" asp-action="Login" class="btn btn-primary">
+        Login
+    </a>
+
+    <a asp-controller="Account" asp-action="Register" class="btn btn-secondary">
+        Register
+    </a>
+}
+else if (Model.Count == 0)
+{
+    <p>Your feed is empty.</p>
+    <p>Follow other users to see their posts here.</p>
+
+    <a asp-controller="Users" asp-action="Search" class="btn btn-primary">
+        Search users
+    </a>
+}
+else
+{
+    <div class="row">
+        @foreach (Post post in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        @if (post.User != null)
+                        {
+                            <a asp-controller="Profile"
+                               asp-action="Details"
+                               asp-route-id="@post.UserId"
+                               class="text-decoration-none text-dark">
+                                <strong>@post.User.UserName</strong>
+                            </a>
+                        }
+                        else
+                        {
+                            <strong>Unknown user</strong>
+                        }
+                    </div>
+
+                    <a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id">
+                        <img src="@post.ImagePath"
+                             class="card-img-top"
+                             alt="Post image"
+                             style="height: 300px; object-fit: cover;" />
+                    </a>
+
+                    <div class="card-body">
+                        <p>@post.Description</p>
+
+                        <p>
+                            <strong>Likes:</strong> @post.LikesCount |
+                            <strong>Comments:</strong> @post.CommentsCount
+                        </p>
+
+                        <a asp-controller="Post"
+                           asp-action="Details"
+                           asp-route-id="@post.Id"
+                           class="btn btn-primary">
+                            View post
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
