@@ -97,17 +97,78 @@ public class PostController : Controller
         return RedirectToAction("Details", new { id = post.Id });
     }
 
-    public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
-        Post? post = _context.Posts
+        Post? post = await _context.Posts
             .Include(post => post.User)
-            .FirstOrDefault(post => post.Id == id);
+            .FirstOrDefaultAsync(post => post.Id == id);
 
         if (post == null)
         {
             return NotFound();
         }
 
+        bool hasLiked = false;
+
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            string? currentUserId = _userManager.GetUserId(User);
+
+            if (currentUserId != null)
+            {
+                hasLiked = await _context.PostLikes
+                    .AnyAsync(like =>
+                        like.PostId == id &&
+                        like.UserId == currentUserId);
+            }
+        }
+
+        ViewBag.HasLiked = hasLiked;
+
         return View(post);
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> Like(int id)
+    {
+        string? currentUserId = _userManager.GetUserId(User);
+
+        if (currentUserId == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        Post? post = await _context.Posts
+            .FirstOrDefaultAsync(post => post.Id == id);
+
+        if (post == null)
+        {
+            return NotFound();
+        }
+
+        bool alreadyLiked = await _context.PostLikes
+            .AnyAsync(like =>
+                like.PostId == id &&
+                like.UserId == currentUserId);
+
+        if (!alreadyLiked)
+        {
+            PostLike like = new PostLike
+            {
+                PostId = id,
+                UserId = currentUserId,
+                CreatedOn = DateTime.UtcNow
+            };
+
+            _context.PostLikes.Add(like);
+
+            post.LikesCount++;
+
+            await _context.SaveChangesAsync();
+        }
+
+        return RedirectToAction("Details", new { id = id });
     }
 }

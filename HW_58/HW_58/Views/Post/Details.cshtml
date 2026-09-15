@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Post details";
+    bool hasLiked = ViewBag.HasLiked == true;
 }
 
 <div class="container">
@@ -53,7 +54,30 @@
                  style="max-height: 650px; object-fit: cover;" />
 
             <div class="card-body">
-                <p><strong>Likes:</strong> @Model.LikesCount</p>
+                <div class="mb-3">
+                    <p><strong>Likes:</strong> @Model.LikesCount</p>
+
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        if (hasLiked)
+                        {
+                            <button class="btn btn-secondary" disabled>
+                                Liked
+                            </button>
+                        }
+                        else
+                        {
+                            <form asp-controller="Post"
+                                  asp-action="Like"
+                                  asp-route-id="@Model.Id"
+                                  method="post">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    Like
+                                </button>
+                            </form>
+                        }
+                    }
+                </div>
                 <p><strong>Comments:</strong> @Model.CommentsCount</p>
                 <p>@Model.Description</p>
                 <p class="text-muted">@Model.CreatedOn.ToString("dd.MM.yyyy HH:mm")</p>
