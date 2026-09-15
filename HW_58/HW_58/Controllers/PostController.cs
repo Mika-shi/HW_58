@@ -101,6 +101,8 @@ public class PostController : Controller
     {
         Post? post = await _context.Posts
             .Include(post => post.User)
+            .Include(post => post.Comments)
+            .ThenInclude(comment => comment.User)
             .FirstOrDefaultAsync(post => post.Id == id);
 
         if (post == null)
@@ -170,5 +172,45 @@ public class PostController : Controller
         }
 
         return RedirectToAction("Details", new { id = id });
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> AddComment(int postId, string text)
+    {
+        string? currentUserId = _userManager.GetUserId(User);
+
+        if (currentUserId == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        Post? post = await _context.Posts
+            .FirstOrDefaultAsync(post => post.Id == postId);
+
+        if (post == null)
+        {
+            return NotFound();
+        }
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            Comment comment = new Comment
+            {
+                Text = text.Trim(),
+                CreatedOn = DateTime.UtcNow,
+                PostId = postId,
+                UserId = currentUserId
+            };
+
+            _context.Comments.Add(comment);
+
+            post.CommentsCount++;
+
+            await _context.SaveChangesAsync();
+        }
+
+        return RedirectToAction("Details", new { id = postId });
     }
 }

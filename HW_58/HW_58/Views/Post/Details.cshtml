@@ -77,6 +77,56 @@
                             </form>
                         }
                     }
+                    
+                    <hr />
+
+                    <h5>Comments</h5>
+
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <form asp-controller="Post"
+                              asp-action="AddComment"
+                              method="post"
+                              class="mb-3">
+
+                            <input type="hidden" name="postId" value="@Model.Id" />
+
+                            <div class="mb-2">
+                                <textarea name="text"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Write a comment..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                Add comment
+                            </button>
+                        </form>
+                    }
+
+                    @if (Model.Comments.Count == 0)
+                    {
+                        <p>No comments yet.</p>
+                    }
+                    else
+                    {
+                        @foreach (Comment comment in Model.Comments.OrderBy(comment => comment.CreatedOn))
+                        {
+                            <div class="border rounded p-2 mb-2">
+                                <p class="mb-1">
+                                    <strong>
+                                        @(comment.User != null ? comment.User.UserName : "Unknown user")
+                                    </strong>
+                                </p>
+
+                                <p class="mb-1">@comment.Text</p>
+
+                                <small class="text-muted">
+                                    @comment.CreatedOn.ToString("dd.MM.yyyy HH:mm")
+                                </small>
+                            </div>
+                        }
+                    }
                 </div>
                 <p><strong>Comments:</strong> @Model.CommentsCount</p>
                 <p>@Model.Description</p>
