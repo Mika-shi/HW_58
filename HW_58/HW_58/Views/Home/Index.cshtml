@@ -5,76 +5,99 @@
     bool isAuthenticated = ViewBag.IsAuthenticated == true;
 }
 
-<h1>Feed</h1>
+<div class="feed-page">
 
-@if (!isAuthenticated)
-{
-    <p>Please login or register to see your feed.</p>
+    @if (!isAuthenticated)
+    {
+        <div class="text-center">
+            <h2>Welcome to Instagram</h2>
+            <p>Log in or register to see your feed.</p>
 
-    <a asp-controller="Account" asp-action="Login" class="btn btn-primary">
-        Login
-    </a>
+            <a asp-controller="Account"
+               asp-action="Login"
+               class="btn btn-primary">
+                Log in
+            </a>
 
-    <a asp-controller="Account" asp-action="Register" class="btn btn-secondary">
-        Register
-    </a>
-}
-else if (Model.Count == 0)
-{
-    <p>Your feed is empty.</p>
-    <p>Follow other users to see their posts here.</p>
+            <a asp-controller="Account"
+               asp-action="Register"
+               class="btn btn-outline-secondary">
+                Register
+            </a>
+        </div>
+    }
+    else if (Model.Count == 0)
+    {
+        <div class="text-center">
+            <p>Your feed is empty.</p>
+            <p>Follow other users to see their posts here.</p>
 
-    <a asp-controller="Users" asp-action="Search" class="btn btn-primary">
-        Search users
-    </a>
-}
-else
-{
-    <div class="row">
+            <a asp-controller="Users"
+               asp-action="Search"
+               class="btn btn-primary">
+                Search users
+            </a>
+        </div>
+    }
+    else
+    {
         @foreach (Post post in Model)
         {
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        @if (post.User != null)
-                        {
-                            <a asp-controller="Profile"
-                               asp-action="Details"
-                               asp-route-id="@post.UserId"
-                               class="text-decoration-none text-dark">
-                                <strong>@post.User.UserName</strong>
-                            </a>
-                        }
-                        else
-                        {
-                            <strong>Unknown user</strong>
-                        }
-                    </div>
+            <div class="feed-post-card">
 
-                    <a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id">
-                        <img src="@post.ImagePath"
-                             class="card-img-top"
-                             alt="Post image"
-                             style="height: 300px; object-fit: cover;" />
+                <div class="feed-post-header">
+                    @if (post.User != null)
+                    {
+                        <a asp-controller="Profile"
+                           asp-action="Details"
+                           asp-route-id="@post.UserId"
+                           class="feed-user-link">
+
+                            <img src="@post.User.AvatarPath"
+                                 class="feed-user-avatar"
+                                 alt="Avatar" />
+
+                            <strong>@post.User.UserName</strong>
+                        </a>
+                    }
+                </div>
+
+                <a asp-controller="Post"
+                   asp-action="Details"
+                   asp-route-id="@post.Id">
+
+                    <img src="@post.ImagePath"
+                         class="feed-post-image"
+                         alt="Post" />
+                </a>
+
+                <div class="feed-post-body">
+
+                    <p class="mb-2">
+                        <strong>Likes:</strong> @post.LikesCount
+                        &nbsp;&nbsp;
+                        <strong>Comments:</strong> @post.CommentsCount
+                    </p>
+
+                    @if (post.User != null)
+                    {
+                        <p class="mb-2">
+                            <strong>@post.User.UserName</strong>
+                            @post.Description
+                        </p>
+                    }
+
+                    <a asp-controller="Post"
+                       asp-action="Details"
+                       asp-route-id="@post.Id"
+                       class="feed-view-comments">
+                        View post
                     </a>
 
-                    <div class="card-body">
-                        <p>@post.Description</p>
-
-                        <p>
-                            <strong>Likes:</strong> @post.LikesCount |
-                            <strong>Comments:</strong> @post.CommentsCount
-                        </p>
-
-                        <a asp-controller="Post"
-                           asp-action="Details"
-                           asp-route-id="@post.Id"
-                           class="btn btn-primary">
-                            View post
-                        </a>
-                    </div>
                 </div>
+
             </div>
         }
-    </div>
-}
+    }
+
+</div>

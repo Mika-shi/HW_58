@@ -1,5 +1,6 @@
 ﻿using HW_58.Models;
 using HW_58.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -195,5 +196,25 @@ public class AccountController : Controller
     public IActionResult AccessDenied()
     {
         return View();
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> SwitchAccount()
+    {
+        await _signInManager.SignOutAsync();
+
+        return RedirectToAction("Login");
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> RegisterNewAccount()
+    {
+        await _signInManager.SignOutAsync();
+
+        return RedirectToAction("Register");
     }
 }
