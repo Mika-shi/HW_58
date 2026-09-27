@@ -55,27 +55,21 @@
 
             <div class="card-body">
                 <div class="mb-3">
-                    <p><strong>Likes:</strong> @Model.LikesCount</p>
+                    <p>
+                        <strong>Likes:</strong>
+                        <span id="likesCount">@Model.LikesCount</span>
+                    </p>
 
                     @if (User.Identity != null && User.Identity.IsAuthenticated)
                     {
-                        if (hasLiked)
-                        {
-                            <button class="btn btn-secondary" disabled>
-                                Liked
-                            </button>
-                        }
-                        else
-                        {
-                            <form asp-controller="Post"
-                                  asp-action="Like"
-                                  asp-route-id="@Model.Id"
-                                  method="post">
-                                <button type="submit" class="btn btn-outline-primary">
-                                    Like
-                                </button>
-                            </form>
-                        }
+                        @Html.AntiForgeryToken()
+                        
+                        <button id="likeButton"
+                                data-post-id="@Model.Id"
+                                data-has-liked="@hasLiked.ToString().ToLower()"
+                                class="btn @(hasLiked ? "btn-secondary" : "btn-outline-primary")">
+                            @(hasLiked ? "Unlike" : "Like")
+                        </button>
                     }
                 </div>
                 <p><strong>Comments:</strong> @Model.CommentsCount</p>

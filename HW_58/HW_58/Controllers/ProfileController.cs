@@ -61,7 +61,7 @@ public class ProfileController : Controller
 
         return View(user);
     }
-    
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize]
@@ -71,25 +71,20 @@ public class ProfileController : Controller
 
         if (currentUserId == null)
         {
-            return RedirectToAction("Login", "Account");
+            return Json(new { success = false });
         }
 
         if (currentUserId == id)
         {
-            return RedirectToAction("Details", new { id = id });
+            return Json(new { success = false });
         }
 
         User? currentUser = await _userManager.FindByIdAsync(currentUserId);
         User? targetUser = await _userManager.FindByIdAsync(id);
 
-        if (currentUser == null)
+        if (currentUser == null || targetUser == null)
         {
-            return RedirectToAction("Login", "Account");
-        }
-
-        if (targetUser == null)
-        {
-            return NotFound();
+            return Json(new { success = false });
         }
 
         bool alreadyFollowing = await _context.Follows
@@ -114,7 +109,7 @@ public class ProfileController : Controller
             await _context.SaveChangesAsync();
         }
 
-        return RedirectToAction("Details", new { id = id });
+        return Json(new { success = true, followersCount = targetUser.FollowersCount });
     }
 
     [HttpPost]
@@ -126,20 +121,15 @@ public class ProfileController : Controller
 
         if (currentUserId == null)
         {
-            return RedirectToAction("Login", "Account");
+            return Json(new {success = false});
         }
 
         User? currentUser = await _userManager.FindByIdAsync(currentUserId);
         User? targetUser = await _userManager.FindByIdAsync(id);
 
-        if (currentUser == null)
+        if (currentUser == null  ||  targetUser == null)
         {
-            return RedirectToAction("Login", "Account");
-        }
-
-        if (targetUser == null)
-        {
-            return NotFound();
+            return Json(new {success = false});
         }
 
         Follow? follow = await _context.Follows
@@ -164,6 +154,6 @@ public class ProfileController : Controller
             await _context.SaveChangesAsync();
         }
 
-        return RedirectToAction("Details", new { id = id });
+        return Json(new {success = true,  followersCount = targetUser.FollowersCount});
     }
 }

@@ -139,7 +139,7 @@ public class PostController : Controller
 
         if (currentUserId == null)
         {
-            return RedirectToAction("Login", "Account");
+            return Json(new {success = false});
         }
 
         Post? post = await _context.Posts
@@ -147,7 +147,7 @@ public class PostController : Controller
 
         if (post == null)
         {
-            return NotFound();
+            return Json(new {success = false});
         }
 
         bool alreadyLiked = await _context.PostLikes
@@ -171,7 +171,51 @@ public class PostController : Controller
             await _context.SaveChangesAsync();
         }
 
-        return RedirectToAction("Details", new { id = id });
+        return Json(new {success = true, likesCount = post.LikesCount});
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> Unlike(int id)
+    {
+        string? currentUserId = _userManager.GetUserId(User);
+
+        if (currentUserId == null)
+        {
+            return Json(new { success = false });
+        }
+
+        Post? post = await _context.Posts
+            .FirstOrDefaultAsync(post => post.Id == id);
+
+        if (post == null)
+        {
+            return Json(new { success = false });
+        }
+
+        PostLike? like = await _context.PostLikes
+            .FirstOrDefaultAsync(like =>
+                like.PostId == id &&
+                like.UserId == currentUserId);
+
+        if (like != null)
+        {
+            _context.PostLikes.Remove(like);
+
+            if (post.LikesCount > 0)
+            {
+                post.LikesCount--;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        return Json(new
+        {
+            success = true,
+            likesCount = post.LikesCount
+        });
     }
     
     [HttpPost]
