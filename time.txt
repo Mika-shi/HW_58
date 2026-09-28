@@ -2,3 +2,7 @@ estimated time: 7-8h
 time spent: ~10.5h
 
 Project link to see the issues - https://github.com/users/Mika-shi/projects/2
+
+HW_62
+estimated time: 3h
+time spent: ~4h
