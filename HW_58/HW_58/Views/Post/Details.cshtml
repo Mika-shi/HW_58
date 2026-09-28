@@ -3,7 +3,11 @@
 @{
     ViewData["Title"] = "Post details";
     bool hasLiked = ViewBag.HasLiked == true;
+    bool isMyPost = ViewBag.IsMyPost == true;
+
 }
+
+@Html.AntiForgeryToken()
 
 <div class="container">
     <div class="mx-auto" style="max-width: 600px;">
@@ -62,8 +66,6 @@
 
                     @if (User.Identity != null && User.Identity.IsAuthenticated)
                     {
-                        @Html.AntiForgeryToken()
-                        
                         <button id="likeButton"
                                 data-post-id="@Model.Id"
                                 data-has-liked="@hasLiked.ToString().ToLower()"
@@ -75,6 +77,40 @@
                 <p><strong>Comments:</strong> @Model.CommentsCount</p>
                 <p>@Model.Description</p>
                 
+                @if (isMyPost)
+                {
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Description
+                        </label>
+
+                        <textarea id="description-@Model.Id"
+                                  class="form-control mb-2"
+                                  rows="3">@Model.Description</textarea>
+
+                        <div class="d-flex gap-2">
+
+                            <button type="button"
+                                    class="btn btn-primary edit-post-button"
+                                    data-post-id="@Model.Id">
+                                Save description
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-danger delete-post-button"
+                                    data-post-id="@Model.Id">
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <p>@Model.Description</p>
+                }
                   
                 <hr />
 
@@ -90,10 +126,7 @@
                         <input type="hidden" name="postId" value="@Model.Id" />
 
                         <div class="mb-2">
-                            <textarea name="text"
-                      class="form-control"
-                      rows="3"
-                      placeholder="Write a comment..."></textarea>
+                            <textarea name="text" class="form-control" rows="3" placeholder="Write a comment..."></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-primary">

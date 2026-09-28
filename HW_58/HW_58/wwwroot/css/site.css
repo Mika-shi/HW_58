@@ -575,3 +575,31 @@ body {
 .feed-view-comments:hover {
   color: #555;
 }
+
+.profile-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.profile-post-card {
+  width: 100%;
+}
+
+.profile-post-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-post-actions {
+  margin-top: 8px;
+}
+
+.profile-post-actions textarea {
+  width: 100%;
+  min-height: 70px;
+  margin-bottom: 8px;
+}

@@ -140,3 +140,53 @@ $(document).ready(function () {
         });
     });
 });
+
+$('.delete-post-button').click(function () {
+    let button = $(this);
+    let postId = button.data('post-id');
+
+    let confirmed = confirm('Are you sure you want to delete this post?');
+
+    if (!confirmed) {
+        return;
+    }
+
+    $.ajax({
+        url: '/Post/DeleteAjax',
+        type: 'POST',
+        data: {
+            id: postId,
+            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+        },
+        success: function (result) {
+            if (result.success) {
+                window.location.href = '/Profile/Details/' + result.userId;
+            }
+        },
+        error: function () {
+            alert('Failed to delete post.');
+        }
+    });
+});
+
+$('.edit-post-button').click(function () {
+    let button = $(this);
+    let postId = button.data('post-id');
+
+    let description = $('#description-' + postId).val();
+
+    $.ajax({
+        url: '/Post/EditDescription',
+        type: 'POST',
+        data: {
+            id: postId,
+            description: description,
+            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+        },
+        success: function (result) {
+            if (result.success) {
+                $('#description-' + postId).val(result.description);
+            }
+        }
+    });
+});

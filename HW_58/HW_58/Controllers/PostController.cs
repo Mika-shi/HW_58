@@ -111,11 +111,11 @@ public class PostController : Controller
         }
 
         bool hasLiked = false;
+        
+        string? currentUserId = _userManager.GetUserId(User);
 
         if (User.Identity != null && User.Identity.IsAuthenticated)
         {
-            string? currentUserId = _userManager.GetUserId(User);
-
             if (currentUserId != null)
             {
                 hasLiked = await _context.PostLikes
@@ -126,6 +126,10 @@ public class PostController : Controller
         }
 
         ViewBag.HasLiked = hasLiked;
+
+        ViewBag.IsMyPost =
+            currentUserId != null &&
+            post.UserId == currentUserId;
 
         return View(post);
     }
@@ -256,5 +260,73 @@ public class PostController : Controller
         }
 
         return RedirectToAction("Details", new { id = postId });
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> DeleteAjax(int id)
+    {
+        string? currentUserId = _userManager.GetUserId(User);
+
+        if (currentUserId == null)
+        {
+            return Json(new { success = false });
+        }
+
+        Post? post = await _context.Posts.FirstOrDefaultAsync(post => post.Id == id);
+
+        if (post == null)
+        {
+            return Json(new { success = false });
+        }
+
+        if (post.UserId != currentUserId)
+        {
+            return Json(new { success = false });
+        }
+
+        _context.Posts.Remove(post);
+
+        await _context.SaveChangesAsync();
+
+        return Json(new
+        {success = true, userId = currentUserId});
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> EditDescription(int id, string description)
+    {
+        string? currentUserId = _userManager.GetUserId(User);
+
+        if (currentUserId == null)
+        {
+            return Json(new { success = false });
+        }
+
+        Post? post = await _context.Posts
+            .FirstOrDefaultAsync(post => post.Id == id);
+
+        if (post == null)
+        {
+            return Json(new { success = false });
+        }
+
+        if (post.UserId != currentUserId)
+        {
+            return Json(new { success = false });
+        }
+
+        post.Description = description;
+
+        await _context.SaveChangesAsync();
+
+        return Json(new
+        {
+            success = true,
+            description = post.Description
+        });
     }
 }
